@@ -18,14 +18,14 @@ public class Order {
     @Column (name = "order_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn (name = "member_id")
     private Member member;
 
-    @OneToMany (mappedBy = "order")
+    @OneToMany (mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne (fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn (name = "delivery_id")// 1:1 관계에서는 둘 중 어디든 owner로 FK를 줘도 상관없다. 하지만 엑세스가 많은 곳에 좋은게 좋다.
     private Delivery delivery;
 
@@ -33,6 +33,23 @@ public class Order {
 
     @Enumerated (EnumType.STRING)
     private OrderStatus status; //주문 상태 [ORDER, CANCEL]
+
+    //연관관계 편의 메서드 양쪽 세팅을 편의적으로 하기위해
+
+    public void setMember(Member member) {
+        this.member = member;
+        member.getOrders().add(this);
+    }
+
+    public void addOrderItem (OrderItem orderItem) {
+        orderItems.add(orderItem);
+        orderItem.setOrder(this);
+    }
+
+    public void setDelivery (Delivery delivery) {
+        this.delivery = delivery;
+        delivery.setOrder(this);
+    }
 
 
 }
