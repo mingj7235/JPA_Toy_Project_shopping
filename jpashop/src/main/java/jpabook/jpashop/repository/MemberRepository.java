@@ -1,6 +1,7 @@
 package jpabook.jpashop.repository;
 
 import jpabook.jpashop.domain.Member;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -10,10 +11,11 @@ import javax.persistence.PersistenceUnit;
 import java.util.List;
 
 @Repository //spring bean으로 등록하기 위해!! component
+@RequiredArgsConstructor
 public class MemberRepository {
 
-    @PersistenceContext // jpa의 entitymanager를 injection 해줌 스프링이 해결해줌
-    private EntityManager em;
+    //@PersistenceContext // jpa의 entitymanager를 injection 해줌 스프링이 해결해줌
+    private final EntityManager em;
 
 //    @PersistenceUnit
 //    private EntityManagerFactory emf; //factory를 직접 주입받고 싶으면 이렇게 하면된다.
