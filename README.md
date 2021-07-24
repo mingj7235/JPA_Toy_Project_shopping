@@ -1,1 +1,1 @@
-# JPA_Toy_Project_-naming-
+# JPA_Toy_Project_Shopping
