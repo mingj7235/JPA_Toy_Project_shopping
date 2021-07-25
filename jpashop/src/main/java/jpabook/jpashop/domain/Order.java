@@ -51,5 +51,52 @@ public class Order {
         delivery.setOrder(this);
     }
 
+    //== 주문 생성 메서드 ==//
+                                                        //... 문법 -> 여러개를 넘길 수 있다.
+    public static Order createOrder (Member member, Delivery delivery, OrderItem... orderItems) {
+        Order order = new Order();
+        order.setMember(member);
+        order.setDelivery(delivery);
+
+        for (OrderItem orderItem : orderItems) {
+            order.addOrderItem(orderItem);
+        }
+        order.setStatus(OrderStatus.ORDER);
+        order.setOrderDate(LocalDateTime.now());
+        return order;
+    }
+
+    //== 비지니스 로직 ==//
+
+    /**
+     * 주문 취소
+     */
+    public void cancel() {
+        if (delivery.getStatus() == DeliveryStatus.COMP) { //상품 배송이 이미 완료된 것 / validation
+            throw new IllegalStateException("이미 배송 완료된 상품은 취소가 불가능합니다. ");
+        }
+
+        //배송완료가 아니라면, cancel로 변경해줘야한다.
+        this.setStatus(OrderStatus.CANCEL);
+        for (OrderItem orderItem : this.orderItems) {
+            orderItem.cancel(); //orderitem도 cancel을 해줘야한다.
+        }
+    }
+
+    //== 조회 로직 ==//
+
+    /**
+     * 전체 주문 가격 조회
+     *
+     */
+    public int getTotalPrice () {
+//       for (OrderItem orderItem : orderItems) {
+//           totalPrice += orderItem.getTotalPrice();
+//       }
+       int totalPrice = orderItems.stream()   //람다로 이렇게 가능 !
+               .mapToInt(OrderItem::getTotalPrice)
+               .sum();
+       return totalPrice;
+    }
 
 }
