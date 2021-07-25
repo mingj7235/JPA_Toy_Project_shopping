@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:test
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        #show_sql: true 로고로 찍어야 하므로 logging에서 debug모드로 찍는다,
+        format_sql: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace
+
+    #스프링 부트에서는 위의 설정을 하지 않으면 지가 알아서 memory모드로 한다. 즉, datasource설정을 안해도된다.
+    #테스트와 운영에서의 yml을 분리하는 것이 당연하다. 설정을 분리 해줘야한다.
