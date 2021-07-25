@@ -1,14 +1,19 @@
 package jpabook.jpashop.domain;
 
 import jpabook.jpashop.domain.item.Item;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Getter @Setter
+@NoArgsConstructor (access = AccessLevel.PROTECTED)
 public class OrderItem {
+
+    //protected OrderItem() { } //private으로 두어서 생성자 생성을 막아준다. -> 로직 분산화를 줄이기 위 (jpa는 protected까지 허용함)
 
     @Id @GeneratedValue
     @Column (name = "order_item_id")

@@ -1,6 +1,8 @@
 package jpabook.jpashop.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -12,6 +14,7 @@ import java.util.List;
 @Table (name = "orders") //order는 db에서 예약어 인경우가 있으므로 orders란 테이블을 새로 생성해준다..
 @Getter
 @Setter
+@NoArgsConstructor (access = AccessLevel.PROTECTED)
 public class Order {
 
     @Id @GeneratedValue
