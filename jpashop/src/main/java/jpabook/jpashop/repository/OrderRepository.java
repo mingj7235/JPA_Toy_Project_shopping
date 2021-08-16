@@ -73,6 +73,12 @@ public class OrderRepository {
      * 유지보수성이 거의 제로다. 어떤 쿼리가 나올것 같다는 것이 한눈에 보이지 않는다.
      * 이것이 JPA의 표준 스펙이지만 안쓰는것이 좋다.
      */
+
+    /**
+     * QueryDSL이 이런 고민 끝에 나온 라이브러리다.
+     * queryDSL을 사용하면 동적 쿼리를 사용하기가 너무 쉽다.
+     * 직관적이고 사용하기가 쉽다. 동적쿼리가 강력하다.
+     */
     public List<Order> findAllByCriteria (OrderSearch orderSearch) { //criteria는 jpa가 표준으로 제공해주는 기준이다.
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Order> cq = cb.createQuery(Order.class);
@@ -96,9 +102,16 @@ public class OrderRepository {
         TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000); //최대 1000건
         return query.getResultList();
     }
+
     /**
-     * QueryDSL이 이런 고민 끝에 나온 라이브러리다.
-     * queryDSL을 사용하면 동적 쿼리를 사용하기가 너무 쉽다.
-     * 직관적이고 사용하기가 쉽다. 동적쿼리가 강력하다.
+     * fetch join을 사용하여 모든 정보를 다 가지고 오기
      */
+    public List<Order> findAllWithMemberDelivery() {
+        return em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d", Order.class
+        ).getResultList();
+    }
+
 }
