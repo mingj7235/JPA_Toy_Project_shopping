@@ -2,11 +2,10 @@ package jpabook.jpashop.api;
 
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.service.MemberService;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -44,6 +43,16 @@ public class MemberApiController {
         return new CreateMemberResponse(id);
     } //실무에서는 절대로 API에서 entity를 받고 내보내지 않는다. DTO로 작업한다.
 
+    @PutMapping ("/api/v2/members/{id}")
+    public UpdateMemberResponse updateMemberV2( //response는 같아도된다.
+            @PathVariable ("id") Long id,
+            @RequestBody @Valid UpdateMemberRequest request){
+
+        memberService.update(id, request.getName());
+        Member findMember = memberService.findOne(id);
+        return new UpdateMemberResponse(findMember.getId(), findMember.getName());
+    }
+
     @Data
     static class CreateMemberRequest { //DTO
         @NotEmpty
@@ -56,5 +65,18 @@ public class MemberApiController {
         public CreateMemberResponse(Long id) {
             this.id = id;
         }
+
+    }
+    @Data
+    static class UpdateMemberRequest {
+        @NotEmpty
+        private String name;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class UpdateMemberResponse {
+        private Long id;
+        private String name;
     }
 }
