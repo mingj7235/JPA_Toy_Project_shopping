@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
         #show_sql: true 로고로 찍어야 하므로 logging에서 debug모드로 찍는다,

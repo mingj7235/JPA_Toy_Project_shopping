@@ -9,10 +9,15 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 public class MemberApiController {
+
+    //API를 만들때는 절대로 바로 entity를 받거나 내보내지 않는다.
+    //무조건 DTO를 만들어라 !
 
     private final MemberService memberService;
 
@@ -51,6 +56,33 @@ public class MemberApiController {
         memberService.update(id, request.getName());
         Member findMember = memberService.findOne(id);
         return new UpdateMemberResponse(findMember.getId(), findMember.getName());
+    }
+    //전체 조회
+    @GetMapping ("/api/v1/members")
+    public List<Member> membersV1 () {
+        return memberService.findMembers();
+        //이렇게 반환하면 안된다.
+    }
+
+    @GetMapping ("/api/v2/members")
+    public Result memberV2 () {
+        List<Member> findMembers = memberService.findMembers();
+        List<MemberDto> collect = findMembers.stream().map(m -> new MemberDto(m.getName()))
+                .collect(Collectors.toList());
+        return new Result(collect.size() ,collect);
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class Result <T> {
+        private int count;
+        private T data;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class MemberDto {
+        private String name; //노출할 것만 여기서 만들기
     }
 
     @Data
