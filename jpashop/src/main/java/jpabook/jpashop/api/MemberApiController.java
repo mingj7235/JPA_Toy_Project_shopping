@@ -48,6 +48,15 @@ public class MemberApiController {
         return new CreateMemberResponse(id);
     } //실무에서는 절대로 API에서 entity를 받고 내보내지 않는다. DTO로 작업한다.
 
+    /**
+     * 등록 V2
+     * CreateMemberRequest를 Member 엔티티 대신에 RequestBody와 매핑한다.
+     * - 엔티티와 프레젠테이션 계층을 위한 로직을 분리할 수 있다.
+     * - 엔티티와 API 스펙을 명확하게 분리할 수 있다.
+     * - 엔티티가 변해도 API 스펙이 변하지 않는다.
+     */
+
+
     @PutMapping ("/api/v2/members/{id}")
     public UpdateMemberResponse updateMemberV2( //response는 같아도된다.
             @PathVariable ("id") Long id,
@@ -57,7 +66,23 @@ public class MemberApiController {
         Member findMember = memberService.findOne(id);
         return new UpdateMemberResponse(findMember.getId(), findMember.getName());
     }
-    //전체 조회
+
+
+    /**
+     * 조회 v1 : 응답 값으로 엔티티를 직접 외부에 노출.
+     * 문제점
+     * - 엔티티에 프레젠테이션 계층을 위한 로직이 추가된다.
+     * - 기본적으로 엔티티의 모든 값이 노출된다.
+     * - 응답 스펙을 맞추기 위해 로직이 추가된다.
+     *      (@JsonIgnore, 별도의 로직 등등) -> 최악이다.
+     * - 실무에서는 같은 엔티티에 대해 API가 용도에 따라 다양하게 만들어 지는데, 한 엔티티에 각각의 API를 위한 프레젠테이션 응답로직을 담기는 어렵다.
+     * - 엔티티가 변경되면 API 스펙이 변한다.
+     * - 또한, 컬렉션을 직접 반환하면 향후 API스펙을 변경하기 어렵다. -> 별도의 Result 클래스 생성을 하여 해결해놓는것이 유연하다.
+     *
+     * 결론 !
+     * API 응답 스펙에 맞추어 별도의 DTO를 반환해야 한다. Must !
+     *
+     */
     @GetMapping ("/api/v1/members")
     public List<Member> membersV1 () {
         return memberService.findMembers();
@@ -68,13 +93,13 @@ public class MemberApiController {
     public Result memberV2 () {
         List<Member> findMembers = memberService.findMembers();
         List<MemberDto> collect = findMembers.stream().map(m -> new MemberDto(m.getName()))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()); //iter를 안하고 이렇게 stream으로 해결하는 방법
         return new Result(collect.size() ,collect);
     }
 
     @Data
     @AllArgsConstructor
-    static class Result <T> {
+    static class Result <T> { //조회 entity를 한번 더 감싸기 위해서
         private int count;
         private T data;
     }
