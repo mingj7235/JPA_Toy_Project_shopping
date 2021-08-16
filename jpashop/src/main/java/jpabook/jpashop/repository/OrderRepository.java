@@ -2,7 +2,6 @@ package jpabook.jpashop.repository;
 
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.domain.Order;
-import jpabook.jpashop.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -114,4 +113,11 @@ public class OrderRepository {
         ).getResultList();
     }
 
+    public List<OrderSimpleQueryDto> findOrderDtos() {
+        return em.createQuery(
+                "select o from Order o" +
+                        " join o.member m" +
+                        " join o.delivery d", OrderSimpleQueryDto.class)
+                .getResultList();
+    }
 }

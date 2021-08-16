@@ -5,6 +5,7 @@ import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.OrderSimpleQueryDto;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,6 +58,15 @@ public class OrderSimpleApiController {
         List<Order> orderList= orderRepository.findAllWithMemberDelivery();
         List<SimpleOrderDto> collect = orderList.stream().map(SimpleOrderDto::new).collect(Collectors.toList());
         return collect;
+    }
+
+    @GetMapping ("/api/v4/simple-orders")
+    public List<OrderSimpleQueryDto> orderV4 () {
+        List <OrderSimpleQueryDto> orderDtoList = orderRepository.findOrderDtos();
+        return orderDtoList;
+        //이렇게 DTO를 조회하는 걸 잘 안사용한다.
+        //정 사용하려면, 쿼리용 dto를 하나 repository 패키지 안에 만들어서 사용한다.
+        //repository는 순수하게 Entity를 조회하는 것으로 사용하는 것이 좋다.
     }
 
     @Data
