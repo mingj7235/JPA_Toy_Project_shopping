@@ -3,6 +3,7 @@ package jpabook.jpashop.api;
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.service.MemberService;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -92,7 +93,7 @@ public class MemberApiController {
     @GetMapping ("/api/v2/members")
     public Result memberV2 () {
         List<Member> findMembers = memberService.findMembers();
-        List<MemberDto> collect = findMembers.stream().map(m -> new MemberDto(m.getName()))
+        List<MemberDto> collect = findMembers.stream().map(MemberDto::new)
                 .collect(Collectors.toList()); //iter를 안하고 이렇게 stream으로 해결하는 방법
         return new Result(collect.size() ,collect);
     }
@@ -108,6 +109,10 @@ public class MemberApiController {
     @AllArgsConstructor
     static class MemberDto {
         private String name; //노출할 것만 여기서 만들기
+
+        public MemberDto (Member member) {
+            this.name = member.getName();
+        }
     }
 
     @Data
