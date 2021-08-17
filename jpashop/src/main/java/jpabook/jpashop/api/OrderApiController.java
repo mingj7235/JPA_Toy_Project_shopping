@@ -44,6 +44,19 @@ public class OrderApiController {
         return result;
     }
 
+    /**
+     *
+     */
+
+    @GetMapping ("/api/v3/orders") //데이터 뻥튀기가 된다. 1:n 관계에서 n 만큼 조인시 뻥튀기가된다.
+    public List<OrderDto> ordersV3() {
+        List<Order> orders = orderRepository.findAllWithItem();
+        List<OrderDto> result = orders.stream()
+                .map(OrderDto::new)
+                .collect(Collectors.toList());
+        return result;
+    }
+
     @Data
     static class OrderDto {
 
@@ -78,4 +91,5 @@ public class OrderApiController {
             count = orderItem.getCount();
         }
     }
+
 }

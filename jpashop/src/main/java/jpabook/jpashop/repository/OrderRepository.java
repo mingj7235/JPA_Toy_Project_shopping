@@ -120,4 +120,33 @@ public class OrderRepository {
                         " join o.delivery d", OrderSimpleQueryDto.class)
                 .getResultList();
     }
+
+    /**
+     * //data 뻥튀기가 된다. 그렇기 때문에 distinct를 넣어준다.
+     * 하지만, db상에서는 distinct가 안된다.
+     * jpa상에서만 보일때만 중복제거가 되는 것이다.
+     * 즉, jpa 에서 자체적으로 같은 id값인 것을 확인해서 중복을 제거해준다.
+     * application 에서 다 가져온 후에 한번 걸러주는 역할을 해주는 것.
+     * but, DB 상에서는 똑같이 중복값이 조회가 된다.
+     *
+     * 성능이 쿼리 1방 ! 으로 해결이 된다.
+     *
+     * but... 페이징이 불가능하다.
+     * 1:n을 fetch join 하는 순간 페이징을 하면 안되는 것을 잊으면 안된다.
+     *
+     * -> memory에서 paging을 해버린다. 메모리가 엄청 부족해진다.
+     *
+     * 즉, 1:n 관계에서는 fetch join 을 하면 안된다.
+     */
+
+    public List<Order> findAllWithItem() {
+        return em.createQuery(
+                "select distinct o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d" +
+                        " join fetch o.orderItems oi" + //data 뻥튀기가 된다. 그렇기 때문에 distinct를 넣어준다.
+                        " join fetch oi.item i", Order.class
+        )
+                .getResultList();
+    }
 }
