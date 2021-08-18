@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -45,6 +46,13 @@ public class OrderApiController {
         return all;
     }
 
+    /**
+     * v2 : dto로 반환 (fetch join 사용 x)
+     *
+     * - 지연 로딩으로 많은 sql이 실행된다.
+     *
+     *
+     */
     @GetMapping ("/api/v2/orders")
     public List<OrderDto> ordersV2() {
         List<Order> orders = orderRepository.findAllByString(new OrderSearch());
@@ -61,6 +69,24 @@ public class OrderApiController {
     @GetMapping ("/api/v3/orders") //데이터 뻥튀기가 된다. 1:n 관계에서 n 만큼 조인시 뻥튀기가된다.
     public List<OrderDto> ordersV3() {
         List<Order> orders = orderRepository.findAllWithItem();
+        List<OrderDto> result = orders.stream()
+                .map(OrderDto::new)
+                .collect(Collectors.toList());
+        return result;
+    }
+
+    /**
+     * v3.1 페치조인 + yml에 hibernate.default_batch_fetch_size 글로벌 세팅
+     * -> 페이징이 가능해진다. 성능도 최적화됨
+     * v3 와 결과는 같으나, 페이징이 가능해진다. 성능도 페치조인을 한만큼 줄어들며, hibernate 설정으로 인해 1+n 뻥튀기도 없어져서 중복도 없다.
+     */
+    @GetMapping ("/api/v3.1/orders")
+    public List<OrderDto> ordersV3_page(@RequestParam (value = "offset", defaultValue = "0") int offset,
+                                            @RequestParam (value = "limit", defaultValue = "100") int limit) {
+
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit); //*toOne 관계는 모두 fetch join으로 가져옴
+                                //in query 로 댕겨온다.
+
         List<OrderDto> result = orders.stream()
                 .map(OrderDto::new)
                 .collect(Collectors.toList());

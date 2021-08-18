@@ -135,8 +135,7 @@ public class OrderRepository {
      * 1:n을 fetch join 하는 순간 페이징을 하면 안되는 것을 잊으면 안된다.
      *
      * -> memory에서 paging을 해버린다. 메모리가 엄청 부족해진다.
-     *
-     * 즉, 1:n 관계에서는 fetch join 을 하면 안된다.
+     * 즉, 1:n 관계에서는 fetch join 을 하여 페이지네이션을 하면안된다.
      */
 
     public List<Order> findAllWithItem() {
@@ -147,6 +146,17 @@ public class OrderRepository {
                         " join fetch o.orderItems oi" + //data 뻥튀기가 된다. 그렇기 때문에 distinct를 넣어준다.
                         " join fetch oi.item i", Order.class
         )
+                .getResultList();
+    }
+
+    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+        return em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d", Order.class
+        )
+                .setFirstResult(offset)
+                .setMaxResults(limit)
                 .getResultList();
     }
 }
