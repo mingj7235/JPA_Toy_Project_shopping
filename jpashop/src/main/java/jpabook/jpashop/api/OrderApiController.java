@@ -79,6 +79,7 @@ public class OrderApiController {
      * v3.1 페치조인 + yml에 hibernate.default_batch_fetch_size 글로벌 세팅
      * -> 페이징이 가능해진다. 성능도 최적화됨
      * v3 와 결과는 같으나, 페이징이 가능해진다. 성능도 페치조인을 한만큼 줄어들며, hibernate 설정으로 인해 1+n 뻥튀기도 없어져서 중복도 없다.
+     * 페이징을 쓰기위해서는 이방법뿐이다.
      */
     @GetMapping ("/api/v3.1/orders")
     public List<OrderDto> ordersV3_page(@RequestParam (value = "offset", defaultValue = "0") int offset,
