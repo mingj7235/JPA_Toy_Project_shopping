@@ -23,6 +23,16 @@ import static java.util.stream.Collectors.*;
 public class OrderApiController {
     private  final OrderRepository orderRepository;
 
+    /**
+     * v1. 엔티티 직접 노출
+     * - Hibernate5Module 모듈 등록 , Lazy = null 처리
+     * - 양방향 관계 문제 발생 -> @JsonIgnore로 처리
+     *
+     * -> 엔티티가 변하면 API 스펙이 변한다.
+     * -> 트랜젝션 안에서 지연 로딩 필요
+     * -> 양방향 연관관계의 문제
+     *
+     */
     @GetMapping("/api/v1/orders")
     public List<Order> ordrsV1() {
         List<Order> all = orderRepository.findAllByString(new OrderSearch());
