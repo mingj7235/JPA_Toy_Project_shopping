@@ -6,6 +6,8 @@ import jpabook.jpashop.domain.OrderItem;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.order.query.OrderQueryDto;
+import jpabook.jpashop.repository.order.query.OrderQueryRepository;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import static java.util.stream.Collectors.*;
 @RequiredArgsConstructor
 public class OrderApiController {
     private  final OrderRepository orderRepository;
+    private  final OrderQueryRepository orderQueryRepository;
 
     /**
      * v1. 엔티티 직접 노출
@@ -83,7 +86,7 @@ public class OrderApiController {
      */
     @GetMapping ("/api/v3.1/orders")
     public List<OrderDto> ordersV3_page(@RequestParam (value = "offset", defaultValue = "0") int offset,
-                                            @RequestParam (value = "limit", defaultValue = "100") int limit) {
+                                        @RequestParam (value = "limit", defaultValue = "100") int limit) {
 
         List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit); //*toOne 관계는 모두 fetch join으로 가져옴
                                 //in query 로 댕겨온다.
@@ -92,6 +95,14 @@ public class OrderApiController {
                 .map(OrderDto::new)
                 .collect(Collectors.toList());
         return result;
+    }
+
+    /**
+     * N+1 문제가 생긴다.
+     */
+    @GetMapping ("/api/v4/orders")
+    public List<OrderQueryDto> ordersV4 () {
+        return orderQueryRepository.findOrderQueryDtos();
     }
 
     @Data
